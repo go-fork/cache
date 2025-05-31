@@ -3,13 +3,13 @@ module go.fork.vn/cache
 go 1.23.9
 
 require (
-	go.fork.vn/di v0.1.0
-	go.fork.vn/config v0.1.0
-	go.fork.vn/mongodb v0.1.0
-	go.fork.vn/redis v0.1.0
 	github.com/redis/go-redis/v9 v9.9.0
 	github.com/stretchr/testify v1.10.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1
+	go.fork.vn/config v0.1.0
+	go.fork.vn/di v0.1.0
+	go.fork.vn/mongodb v0.1.0
+	go.fork.vn/redis v0.1.0
 	go.mongodb.org/mongo-driver v1.17.3
 )
 
