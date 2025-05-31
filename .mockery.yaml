@@ -1,0 +1,22 @@
+with-expecter: true
+dir: "mocks"
+outpkg: "mocks"
+packages:
+  "go.fork.vn/cache":
+    interfaces:
+      Manager:
+        config:
+          dir: "mocks"
+          filename: "manager.go"
+          mockname: "MockManager"
+          outpkg: "mocks"
+          structname: "MockManager"
+  "go.fork.vn/cache/driver":
+    interfaces:
+      Driver:
+        config:
+          dir: "mocks"
+          filename: "driver.go"
+          mockname: "MockDriver"
+          outpkg: "mocks"
+          structname: "MockDriver"
