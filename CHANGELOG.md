@@ -28,9 +28,9 @@
 
 ### Technical Details
 - Initial release as standalone module `go.fork.vn/cache`
-- Repository located at `github.com/go-fork/cache`
+- Repository located at `github.com/Fork/cache`
 - Built with Go 1.23.9
 - Full test coverage and documentation included
 
-[Unreleased]: https://github.com/go-fork/cache/compare/v0.1.0...HEAD
-[v0.1.0]: https://github.com/go-fork/cache/releases/tag/v0.1.0
+[Unreleased]: github.com/go-fork/cache/compare/v0.1.0...HEAD
+[v0.1.0]: github.com/go-fork/cache/releases/tag/v0.1.0

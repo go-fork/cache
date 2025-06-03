@@ -250,8 +250,8 @@ func TestFileDriverIntegration(t *testing.T) {
 
 	t.Run("Stats", func(t *testing.T) {
 		// Set some test data
-		fileDriver.Set(ctx, "stats1", "value1", 0)
-		fileDriver.Set(ctx, "stats2", "value2", 0)
+		_ = fileDriver.Set(ctx, "stats1", "value1", 0)
+		_ = fileDriver.Set(ctx, "stats2", "value2", 0)
 
 		stats := fileDriver.Stats(ctx)
 
@@ -267,8 +267,8 @@ func TestFileDriverIntegration(t *testing.T) {
 
 	t.Run("Flush", func(t *testing.T) {
 		// Set some test data
-		fileDriver.Set(ctx, "flush1", "value1", 0)
-		fileDriver.Set(ctx, "flush2", "value2", 0)
+		_ = fileDriver.Set(ctx, "flush1", "value1", 0)
+		_ = fileDriver.Set(ctx, "flush2", "value2", 0)
 
 		// Verify data exists
 		assert.True(t, fileDriver.Has(ctx, "flush1"))
@@ -565,7 +565,7 @@ func TestFileDriverConcurrency(t *testing.T) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:write:%d:%d", id, j)
 					value := fmt.Sprintf("value_%d_%d", id, j)
-					fileDriver.Set(ctx, key, value, 0)
+					_ = fileDriver.Set(ctx, key, value, 0)
 				}
 				done <- true
 			}(i)
@@ -576,7 +576,7 @@ func TestFileDriverConcurrency(t *testing.T) {
 			go func(id int) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:read:%d:%d", id, j)
-					fileDriver.Set(ctx, key, "read_value", 0)
+					_ = fileDriver.Set(ctx, key, "read_value", 0)
 					fileDriver.Get(ctx, key)
 				}
 				done <- true
@@ -622,7 +622,7 @@ func BenchmarkFileDriver(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			key := fmt.Sprintf("bench:set:%d", i)
-			fileDriver.Set(ctx, key, value, 0)
+			_ = fileDriver.Set(ctx, key, value, 0)
 		}
 	})
 
@@ -631,7 +631,7 @@ func BenchmarkFileDriver(b *testing.B) {
 		value := "simple_string_value" // Use simple string instead of map
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:get:%d", i)
-			fileDriver.Set(ctx, key, value, 0)
+			_ = fileDriver.Set(ctx, key, value, 0)
 		}
 
 		b.ResetTimer()
@@ -650,7 +650,7 @@ func BenchmarkFileDriver(b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
-			fileDriver.SetMultiple(ctx, values, 0)
+			_ = fileDriver.SetMultiple(ctx, values, 0)
 		}
 	})
 
@@ -661,7 +661,7 @@ func BenchmarkFileDriver(b *testing.B) {
 			"bench2": "value2",
 			"bench3": "value3",
 		}
-		fileDriver.SetMultiple(ctx, values, 0)
+		_ = fileDriver.SetMultiple(ctx, values, 0)
 
 		keys := []string{"bench1", "bench2", "bench3"}
 		b.ResetTimer()
@@ -675,7 +675,7 @@ func BenchmarkFileDriver(b *testing.B) {
 		// Setup data
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:has:%d", i)
-			fileDriver.Set(ctx, key, "value", 0)
+			_ = fileDriver.Set(ctx, key, "value", 0)
 		}
 
 		b.ResetTimer()
@@ -773,7 +773,7 @@ func TestFileDriverComprehensive(t *testing.T) {
 				for j := 0; j < numOperations; j++ {
 					key := fmt.Sprintf("concurrent_key_%d_%d", id, j)
 					value := fmt.Sprintf("value_%d_%d", id, j)
-					fileDriver.Set(ctx, key, value, 0)
+					_ = fileDriver.Set(ctx, key, value, 0)
 				}
 			}(i)
 		}
@@ -884,7 +884,7 @@ func TestFileDriverComprehensive(t *testing.T) {
 		}
 
 		// Restore permissions for cleanup
-		os.Chmod(readOnlyDir, 0755)
+		_ = os.Chmod(readOnlyDir, 0755)
 	})
 
 	t.Run("Large Dataset Operations", func(t *testing.T) {

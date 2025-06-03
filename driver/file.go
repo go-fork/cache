@@ -412,7 +412,7 @@ func (d *fileDriver) Stats(ctx context.Context) map[string]interface{} {
 	var size int64
 
 	// Đếm số lượng file và kích thước
-	filepath.Walk(d.directory, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(d.directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

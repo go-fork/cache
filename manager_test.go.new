@@ -18,7 +18,7 @@ func TestManager_New(t *testing.T) {
 	t.Run("creates_new_manager_instance", func(t *testing.T) {
 		// Act
 		manager := cache.NewManager()
-
+		
 		// Assert
 		assert.NotNil(t, manager)
 

@@ -2,12 +2,12 @@
 
 ## Giới thiệu
 
-Cache Provider là một package cung cấp hệ thống quản lý cache hiện đại, linh hoạt và có khả năng mở rộng cao cho framework dependency injection go-fork. Provider này cung cấp tích hợp cache với nhiều backend khác nhau như Memory, File, Redis và MongoDB trong ứng dụng Go. Package này được thiết kế để giúp đơn giản hóa việc tích hợp cache vào ứng dụng Go của bạn, đồng thời hỗ trợ các tính năng nâng cao như Remember pattern, batch operations và TTL management.
+Cache Provider là một package cung cấp hệ thống quản lý cache hiện đại, linh hoạt và có khả năng mở rộng cao cho framework dependency injection Fork. Provider này cung cấp tích hợp cache với nhiều backend khác nhau như Memory, File, Redis và MongoDB trong ứng dụng Go. Package này được thiết kế để giúp đơn giản hóa việc tích hợp cache vào ứng dụng Go của bạn, đồng thời hỗ trợ các tính năng nâng cao như Remember pattern, batch operations và TTL management.
 
 ## Tổng quan
 
 Cache Provider hỗ trợ:
-- Tích hợp dễ dàng với framework dependency injection go-fork
+- Tích hợp dễ dàng với framework dependency injection Fork
 - Đa dạng driver storage backend (Memory, File, Redis, MongoDB)
 - TTL (Time To Live) tự động cho cache entries
 - Remember pattern để lazy computation và caching

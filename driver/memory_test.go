@@ -196,8 +196,8 @@ func TestMemoryDriverIntegration(t *testing.T) {
 
 	t.Run("Stats", func(t *testing.T) {
 		// Set some test data
-		memoryDriver.Set(ctx, "stats1", "value1", 0)
-		memoryDriver.Set(ctx, "stats2", "value2", 0)
+		_ = memoryDriver.Set(ctx, "stats1", "value1", 0)
+		_ = memoryDriver.Set(ctx, "stats2", "value2", 0)
 
 		stats := memoryDriver.Stats(ctx)
 
@@ -211,8 +211,8 @@ func TestMemoryDriverIntegration(t *testing.T) {
 
 	t.Run("Flush", func(t *testing.T) {
 		// Set some test data
-		memoryDriver.Set(ctx, "flush1", "value1", 0)
-		memoryDriver.Set(ctx, "flush2", "value2", 0)
+		_ = memoryDriver.Set(ctx, "flush1", "value1", 0)
+		_ = memoryDriver.Set(ctx, "flush2", "value2", 0)
 
 		// Verify data exists
 		assert.True(t, memoryDriver.Has(ctx, "flush1"))
@@ -422,7 +422,7 @@ func TestMemoryDriverConcurrency(t *testing.T) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:write:%d:%d", id, j)
 					value := fmt.Sprintf("value_%d_%d", id, j)
-					memoryDriver.Set(ctx, key, value, 0)
+					_ = memoryDriver.Set(ctx, key, value, 0)
 				}
 				done <- true
 			}(i)
@@ -433,7 +433,7 @@ func TestMemoryDriverConcurrency(t *testing.T) {
 			go func(id int) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:read:%d:%d", id, j)
-					memoryDriver.Set(ctx, key, "read_value", 0)
+					_ = memoryDriver.Set(ctx, key, "read_value", 0)
 					memoryDriver.Get(ctx, key)
 				}
 				done <- true
@@ -467,7 +467,7 @@ func BenchmarkMemoryDriver(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			key := fmt.Sprintf("bench:set:%d", i)
-			memoryDriver.Set(ctx, key, value, 0)
+			_ = memoryDriver.Set(ctx, key, value, 0)
 		}
 	})
 
@@ -476,7 +476,7 @@ func BenchmarkMemoryDriver(b *testing.B) {
 		value := map[string]interface{}{"test": "value", "number": 123}
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:get:%d", i)
-			memoryDriver.Set(ctx, key, value, 0)
+			_ = memoryDriver.Set(ctx, key, value, 0)
 		}
 
 		b.ResetTimer()
@@ -495,7 +495,7 @@ func BenchmarkMemoryDriver(b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
-			memoryDriver.SetMultiple(ctx, values, 0)
+			_ = memoryDriver.SetMultiple(ctx, values, 0)
 		}
 	})
 
@@ -506,7 +506,7 @@ func BenchmarkMemoryDriver(b *testing.B) {
 			"bench2": "value2",
 			"bench3": "value3",
 		}
-		memoryDriver.SetMultiple(ctx, values, 0)
+		_ = memoryDriver.SetMultiple(ctx, values, 0)
 
 		keys := []string{"bench1", "bench2", "bench3"}
 		b.ResetTimer()
@@ -520,7 +520,7 @@ func BenchmarkMemoryDriver(b *testing.B) {
 		// Setup data
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:has:%d", i)
-			memoryDriver.Set(ctx, key, "value", 0)
+			_ = memoryDriver.Set(ctx, key, "value", 0)
 		}
 
 		b.ResetTimer()

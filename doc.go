@@ -1,5 +1,5 @@
 // Package cache cung cấp một hệ thống quản lý cache hiện đại, linh hoạt và có khả năng mở rộng cao
-// cho framework dependency injection go-fork.
+// cho framework dependency injection Fork.
 //
 // Package này được thiết kế theo kiến trúc đa driver, cho phép tích hợp dễ dàng với nhiều loại
 // storage backend khác nhau như Memory, File, Redis và MongoDB. Với interface Driver đã được thiết kế

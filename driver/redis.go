@@ -53,6 +53,11 @@ func NewRedisDriver(config config.DriverRedisConfig, redis_manager redisManager.
 	if !config.Enabled {
 		return nil, fmt.Errorf("redis driver is not enabled")
 	}
+
+	if redis_manager == nil {
+		return nil, fmt.Errorf("redis manager cannot be nil")
+	}
+
 	client, err := redis_manager.Client()
 	if err != nil {
 		return nil, fmt.Errorf("could not create Redis client: %w", err)

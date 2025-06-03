@@ -72,7 +72,7 @@ func TestMongoDriverIntegration(t *testing.T) {
 	if err != nil {
 		t.Skip("MongoDB not available, skipping integration tests")
 	}
-	defer client.Disconnect(ctx)
+	defer func() { _ = client.Disconnect(ctx) }()
 
 	// Ping to verify connection
 	if err := client.Ping(ctx, nil); err != nil {
@@ -231,8 +231,8 @@ func TestMongoDriverIntegration(t *testing.T) {
 
 	t.Run("Stats", func(t *testing.T) {
 		// Set some test data
-		mongoDriver.Set(ctx, "stats1", "value1", 0)
-		mongoDriver.Set(ctx, "stats2", "value2", 0)
+		_ = mongoDriver.Set(ctx, "stats1", "value1", 0)
+		_ = mongoDriver.Set(ctx, "stats2", "value2", 0)
 
 		stats := mongoDriver.Stats(ctx)
 
@@ -246,8 +246,8 @@ func TestMongoDriverIntegration(t *testing.T) {
 
 	t.Run("Flush", func(t *testing.T) {
 		// Set some test data
-		mongoDriver.Set(ctx, "flush1", "value1", 0)
-		mongoDriver.Set(ctx, "flush2", "value2", 0)
+		_ = mongoDriver.Set(ctx, "flush1", "value1", 0)
+		_ = mongoDriver.Set(ctx, "flush2", "value2", 0)
 
 		// Verify data exists
 		assert.True(t, mongoDriver.Has(ctx, "flush1"))
@@ -498,7 +498,7 @@ func TestMongoDriverConcurrency(t *testing.T) {
 	if err != nil {
 		t.Skip("MongoDB not available, skipping concurrency tests")
 	}
-	defer client.Disconnect(ctx)
+	defer func() { _ = client.Disconnect(ctx) }()
 
 	if err := client.Ping(ctx, nil); err != nil {
 		t.Skip("MongoDB not accessible, skipping concurrency tests")
@@ -533,7 +533,7 @@ func TestMongoDriverConcurrency(t *testing.T) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:write:%d:%d", id, j)
 					value := fmt.Sprintf("value_%d_%d", id, j)
-					mongoDriver.Set(ctx, key, value, 0)
+					_ = mongoDriver.Set(ctx, key, value, 0)
 				}
 				done <- true
 			}(i)
@@ -544,7 +544,7 @@ func TestMongoDriverConcurrency(t *testing.T) {
 			go func(id int) {
 				for j := 0; j < 10; j++ {
 					key := fmt.Sprintf("concurrent:read:%d:%d", id, j)
-					mongoDriver.Set(ctx, key, "read_value", 0)
+					_ = mongoDriver.Set(ctx, key, "read_value", 0)
 					mongoDriver.Get(ctx, key)
 				}
 				done <- true
@@ -574,7 +574,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 	if err != nil {
 		b.Skip("MongoDB not available, skipping benchmarks")
 	}
-	defer client.Disconnect(ctx)
+	defer func() { _ = client.Disconnect(ctx) }()
 
 	if err := client.Ping(ctx, nil); err != nil {
 		b.Skip("MongoDB not accessible, skipping benchmarks")
@@ -607,7 +607,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			key := fmt.Sprintf("bench:set:%d", i)
-			mongoDriver.Set(ctx, key, value, 0)
+			_ = mongoDriver.Set(ctx, key, value, 0)
 		}
 	})
 
@@ -616,7 +616,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 		value := map[string]interface{}{"test": "value", "number": 123}
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:get:%d", i)
-			mongoDriver.Set(ctx, key, value, 0)
+			_ = mongoDriver.Set(ctx, key, value, 0)
 		}
 
 		b.ResetTimer()
@@ -635,7 +635,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
-			mongoDriver.SetMultiple(ctx, values, 0)
+			_ = mongoDriver.SetMultiple(ctx, values, 0)
 		}
 	})
 
@@ -646,7 +646,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 			"bench2": "value2",
 			"bench3": "value3",
 		}
-		mongoDriver.SetMultiple(ctx, values, 0)
+		_ = mongoDriver.SetMultiple(ctx, values, 0)
 
 		keys := []string{"bench1", "bench2", "bench3"}
 		b.ResetTimer()
@@ -660,7 +660,7 @@ func BenchmarkMongoDriver(b *testing.B) {
 		// Setup data
 		for i := 0; i < 1000; i++ {
 			key := fmt.Sprintf("bench:has:%d", i)
-			mongoDriver.Set(ctx, key, "value", 0)
+			_ = mongoDriver.Set(ctx, key, "value", 0)
 		}
 
 		b.ResetTimer()
