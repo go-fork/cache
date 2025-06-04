@@ -287,12 +287,22 @@ func TestServiceProvider_Register(t *testing.T) {
 		// Note: Redis and MongoDB manager expectations not verified as conversion fails
 	})
 
-	t.Run("with_nil_app_returns_early", func(t *testing.T) {
+	t.Run("with_nil_app_panics", func(t *testing.T) {
 		// Arrange
 		provider := cache.NewServiceProvider()
 
 		// Act & Assert
-		assert.NotPanics(t, func() {
+		assert.Panics(t, func() {
+			provider.Register(nil)
+		})
+	})
+
+	t.Run("with_nil_app_panics_with_correct_message", func(t *testing.T) {
+		// Arrange
+		provider := cache.NewServiceProvider()
+
+		// Act & Assert
+		assert.PanicsWithValue(t, "di application can not nill.", func() {
 			provider.Register(nil)
 		})
 	})
@@ -723,12 +733,22 @@ func TestServiceProvider_Register(t *testing.T) {
 }
 
 func TestServiceProvider_Boot(t *testing.T) {
-	t.Run("boot_with_nil_app", func(t *testing.T) {
+	t.Run("boot_with_nil_app_panics", func(t *testing.T) {
 		// Arrange
 		provider := cache.NewServiceProvider()
 
 		// Act & Assert
-		assert.NotPanics(t, func() {
+		assert.Panics(t, func() {
+			provider.Boot(nil)
+		})
+	})
+
+	t.Run("boot_with_nil_app_panics_with_correct_message", func(t *testing.T) {
+		// Arrange
+		provider := cache.NewServiceProvider()
+
+		// Act & Assert
+		assert.PanicsWithValue(t, "di application can not nill.", func() {
 			provider.Boot(nil)
 		})
 	})

@@ -5,10 +5,12 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
 
+	"github.com/go-redis/redismock/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -58,12 +60,12 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 	t.Run("returns_error_when_redis_driver_is_disabled", func(t *testing.T) {
 		// Arrange
 		mockManager := &mockRedisManager{}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled: false,
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.Error(t, err)
@@ -76,13 +78,13 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 		mockManager := &mockRedisManager{
 			clientError: fmt.Errorf("redis connection failed"),
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.Error(t, err)
@@ -98,14 +100,14 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "json",
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.NoError(t, err)
@@ -120,14 +122,14 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "gob",
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.NoError(t, err)
@@ -142,14 +144,14 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "msgpack",
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.NoError(t, err)
@@ -164,14 +166,14 @@ func TestRedisDriver_NewRedisDriver(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "unknown",
 		}
 
 		// Act
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 
 		// Assert
 		assert.NoError(t, err)
@@ -189,13 +191,13 @@ func TestRedisDriver_Serializers(t *testing.T) {
 	}
 
 	t.Run("json_serializer", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 
@@ -207,13 +209,13 @@ func TestRedisDriver_Serializers(t *testing.T) {
 	})
 
 	t.Run("gob_serializer", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "gob",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 
@@ -222,13 +224,13 @@ func TestRedisDriver_Serializers(t *testing.T) {
 	})
 
 	t.Run("msgpack_serializer", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "msgpack",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 
@@ -243,12 +245,12 @@ func TestRedisDriver_Serializers(t *testing.T) {
 // TestRedisDriver_ErrorHandling kiểm tra xử lý lỗi
 func TestRedisDriver_ErrorHandling(t *testing.T) {
 	t.Run("nil_redis_manager", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, nil)
+		redisDriver, err := driver.NewRedisDriver(configTest, nil)
 		assert.Error(t, err)
 		assert.Nil(t, redisDriver)
 		assert.Contains(t, err.Error(), "redis manager cannot be nil")
@@ -258,12 +260,12 @@ func TestRedisDriver_ErrorHandling(t *testing.T) {
 		mockManager := &mockRedisManager{
 			clientError: fmt.Errorf("failed to connect to redis"),
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		assert.Error(t, err)
 		assert.Nil(t, redisDriver)
 		assert.Contains(t, err.Error(), "failed to connect to redis")
@@ -280,32 +282,32 @@ func TestRedisDriver_Configuration(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 600, // 10 minutes
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 
 		// Verify the driver was created with correct config
-		assert.Equal(t, 600, config.DefaultTTL)
-		assert.Equal(t, "json", config.Serializer)
+		assert.Equal(t, 600, configTest.DefaultTTL)
+		assert.Equal(t, "json", configTest.Serializer)
 	})
 
 	t.Run("zero_ttl_configuration", func(t *testing.T) {
 		mockManager := &mockRedisManager{
 			client: client,
 		}
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 0, // No expiration
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 	})
@@ -321,25 +323,25 @@ func TestRedisDriver_EdgeCases(t *testing.T) {
 	}
 
 	t.Run("empty_serializer_fallback_to_json", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "", // Empty serializer
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 	})
 
 	t.Run("invalid_serializer_fallback_to_json", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "invalid_serializer",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 	})
@@ -376,13 +378,13 @@ func TestRedisDriver_Integration(t *testing.T) {
 	}()
 
 	t.Run("real_redis_operations", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, redisManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, redisManager)
 		require.NoError(t, err)
 		require.NotNil(t, redisDriver)
 
@@ -421,13 +423,13 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	mockManager := &mockRedisManager{
 		client: client,
 	}
-	config := config.DriverRedisConfig{
+	configTest := config.DriverRedisConfig{
 		Enabled:    true,
 		DefaultTTL: 300,
 		Serializer: "json",
 	}
 
-	redisDriver, err := driver.NewRedisDriver(config, mockManager)
+	redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 	require.NoError(t, err)
 	require.NotNil(t, redisDriver)
 
@@ -437,20 +439,33 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 		key := "test:set:get"
 		value := "test_value"
 
-		// Mock SET command
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager first
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		mock.ExpectSet("cache:"+key, mock.MatchAnyString(), time.Duration(300)*time.Second).SetVal("OK")
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
-		err := redisDriver.Set(ctx, key, value, 5*time.Minute)
+		// The driver serializes the value before storing - JSON adds quotes around strings
+		// TTL: 5*time.Minute = 300 seconds
+		expectedData, _ := json.Marshal(value)
+		mock.ExpectSet("cache:"+key, expectedData, 5*time.Minute).SetVal("OK")
+
+		err = testRedisDriver.Set(ctx, key, value, 5*time.Minute)
 		assert.NoError(t, err)
 
 		// Mock GET command
-		expectedData, _ := json.Marshal(value)
-		mock.ExpectGet("cache:" + key).SetVal(string(expectedData))
+		mock.ExpectGet("cache:" + key).SetVal(`"test_value"`)
 
-		result, found := redisDriver.Get(ctx, key)
+		result, found := testRedisDriver.Get(ctx, key)
 		assert.True(t, found)
 		assert.Equal(t, value, result)
 
@@ -460,16 +475,27 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	t.Run("Has", func(t *testing.T) {
 		key := "test:has"
 
-		// Mock EXISTS command
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectExists("cache:" + key).SetVal(1)
-		exists := redisDriver.Has(ctx, key)
+		exists := testRedisDriver.Has(ctx, key)
 		assert.True(t, exists)
 
 		mock.ExpectExists("cache:" + key).SetVal(0)
-		exists = redisDriver.Has(ctx, key)
+		exists = testRedisDriver.Has(ctx, key)
 		assert.False(t, exists)
 
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -478,13 +504,24 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	t.Run("Delete", func(t *testing.T) {
 		key := "test:delete"
 
-		// Mock DEL command
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectDel("cache:" + key).SetVal(1)
 
-		err := redisDriver.Delete(ctx, key)
+		err = testRedisDriver.Delete(ctx, key)
 		assert.NoError(t, err)
 
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -493,19 +530,27 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	t.Run("GetMultiple", func(t *testing.T) {
 		keys := []string{"key1", "key2", "key3"}
 
-		// Mock MGET command
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		// Prepare expected data
-		value1Data, _ := json.Marshal("value1")
-		value2Data, _ := json.Marshal("value2")
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
+		// Prepare expected data - JSON adds quotes around strings
 		mock.ExpectMGet("cache:key1", "cache:key2", "cache:key3").SetVal([]interface{}{
-			string(value1Data), string(value2Data), nil, // key3 not found
+			`"value1"`, `"value2"`, nil, // key3 not found
 		})
 
-		results, missed := redisDriver.GetMultiple(ctx, keys)
+		results, missed := testRedisDriver.GetMultiple(ctx, keys)
 
 		assert.Len(t, results, 2)
 		assert.Len(t, missed, 1)
@@ -522,14 +567,28 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 			"multi2": "value2",
 		}
 
-		// Mock multiple SET commands
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		mock.ExpectSet("cache:multi1", mock.MatchAnyString(), time.Duration(300)*time.Second).SetVal("OK")
-		mock.ExpectSet("cache:multi2", mock.MatchAnyString(), time.Duration(300)*time.Second).SetVal("OK")
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
-		err := redisDriver.SetMultiple(ctx, values, 5*time.Minute)
+		// The driver serializes each value before storing - JSON adds quotes around strings
+		expectedData1, _ := json.Marshal("value1")
+		expectedData2, _ := json.Marshal("value2")
+		mock.ExpectSet("cache:multi1", expectedData1, time.Duration(300)*time.Second).SetVal("OK")
+		mock.ExpectSet("cache:multi2", expectedData2, time.Duration(300)*time.Second).SetVal("OK")
+
+		err = testRedisDriver.SetMultiple(ctx, values, 5*time.Minute)
 		assert.NoError(t, err)
 
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -538,13 +597,24 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	t.Run("DeleteMultiple", func(t *testing.T) {
 		keys := []string{"del1", "del2", "del3"}
 
-		// Mock DEL command with multiple keys
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectDel("cache:del1", "cache:del2", "cache:del3").SetVal(3)
 
-		err := redisDriver.DeleteMultiple(ctx, keys)
+		err = testRedisDriver.DeleteMultiple(ctx, keys)
 		assert.NoError(t, err)
 
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -560,14 +630,27 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 			return expectedValue, nil
 		}
 
-		// Mock GET command (cache miss)
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectGet("cache:" + key).RedisNil()
-		mock.ExpectSet("cache:"+key, mock.MatchAnyString(), time.Duration(300)*time.Second).SetVal("OK")
+		// The driver serializes the value before storing - JSON adds quotes around strings
+		expectedData, _ := json.Marshal(expectedValue)
+		mock.ExpectSet("cache:"+key, expectedData, time.Duration(300)*time.Second).SetVal("OK")
 
-		result, err := redisDriver.Remember(ctx, key, 0, callback)
+		result, err := testRedisDriver.Remember(ctx, key, 0, callback)
 		assert.NoError(t, err)
 		assert.Equal(t, expectedValue, result)
 		assert.True(t, callbackCalled)
@@ -585,14 +668,25 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 			return "should_not_be_called", nil
 		}
 
-		// Mock GET command (cache hit)
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		cachedData, _ := json.Marshal(cachedValue)
-		mock.ExpectGet("cache:" + key).SetVal(string(cachedData))
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
-		result, err := redisDriver.Remember(ctx, key, 0, callback)
+		// JSON adds quotes around strings
+		mock.ExpectGet("cache:" + key).SetVal(`"cached_value"`)
+
+		result, err := testRedisDriver.Remember(ctx, key, 0, callback)
 		assert.NoError(t, err)
 		assert.Equal(t, cachedValue, result)
 		assert.False(t, callbackCalled)
@@ -601,14 +695,25 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	})
 
 	t.Run("Stats", func(t *testing.T) {
-		// Mock KEYS and INFO commands
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectKeys("cache:*").SetVal([]string{"cache:key1", "cache:key2"})
 		mock.ExpectInfo().SetVal("redis_version:7.0.0\nused_memory:1024\n")
 
-		stats := redisDriver.Stats(ctx)
+		stats := testRedisDriver.Stats(ctx)
 
 		assert.Contains(t, stats, "count")
 		assert.Contains(t, stats, "hits")
@@ -624,15 +729,26 @@ func TestRedisDriver_InterfaceMethods(t *testing.T) {
 	})
 
 	t.Run("Flush", func(t *testing.T) {
-		// Mock SCAN and DEL commands
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		// Mock SCAN command
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
+
+		// Mock SCAN and DEL commands
 		mock.ExpectScan(0, "cache:*", 0).SetVal([]string{"cache:key1", "cache:key2"}, 0)
 		mock.ExpectDel("cache:key1", "cache:key2").SetVal(2)
 
-		err := redisDriver.Flush(ctx)
+		err = testRedisDriver.Flush(ctx)
 		assert.NoError(t, err)
 
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -655,25 +771,39 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 	mockManager := &mockRedisManager{
 		client: client,
 	}
-	config := config.DriverRedisConfig{
+	configTest := config.DriverRedisConfig{
 		Enabled:    true,
 		DefaultTTL: 300,
 		Serializer: "json",
 	}
 
-	redisDriver, err := driver.NewRedisDriver(config, mockManager)
+	redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 	require.NoError(t, err)
 	require.NotNil(t, redisDriver)
 
 	ctx := context.Background()
 
 	t.Run("Set_Error", func(t *testing.T) {
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
 
-		mock.ExpectSet("cache:test", mock.MatchAnyString(), time.Duration(300)*time.Second).SetErr(errors.New("redis error"))
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
-		err := redisDriver.Set(ctx, "test", "value", 0)
+		// The driver serializes the value before storing - JSON adds quotes around strings
+		expectedData, _ := json.Marshal("value")
+		mock.ExpectSet("cache:test", expectedData, time.Duration(300)*time.Second).SetErr(errors.New("redis error"))
+
+		err = testRedisDriver.Set(ctx, "test", "value", 0)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "redis error")
 
@@ -681,12 +811,24 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 	})
 
 	t.Run("Get_Error", func(t *testing.T) {
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectGet("cache:test").SetErr(errors.New("redis get error"))
 
-		result, found := redisDriver.Get(ctx, "test")
+		result, found := testRedisDriver.Get(ctx, "test")
 		assert.False(t, found)
 		assert.Nil(t, result)
 
@@ -694,12 +836,24 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 	})
 
 	t.Run("Delete_Error", func(t *testing.T) {
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		mock.ExpectDel("cache:test").SetErr(errors.New("redis delete error"))
 
-		err := redisDriver.Delete(ctx, "test")
+		err = testRedisDriver.Delete(ctx, "test")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "redis delete error")
 
@@ -707,8 +861,20 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 	})
 
 	t.Run("Remember_Callback_Error", func(t *testing.T) {
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		// Create driver with mock client
+		testConfig := config.DriverRedisConfig{
+			Enabled:    true,
+			DefaultTTL: 300,
+			Serializer: "json",
+		}
+		testRedisDriver, err := driver.NewRedisDriver(testConfig, testMockManager)
+		require.NoError(t, err)
 
 		callbackError := errors.New("callback error")
 		callback := func() (interface{}, error) {
@@ -717,7 +883,7 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 
 		mock.ExpectGet("cache:test").RedisNil()
 
-		result, err := redisDriver.Remember(ctx, "test", 0, callback)
+		result, err := testRedisDriver.Remember(ctx, "test", 0, callback)
 		assert.Error(t, err)
 		assert.Equal(t, callbackError, err)
 		assert.Nil(t, result)
@@ -728,26 +894,23 @@ func TestRedisDriver_ErrorScenarios(t *testing.T) {
 
 // TestRedisDriver_Serialization kiểm tra serialization/deserialization
 func TestRedisDriver_Serialization(t *testing.T) {
-	client := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-	})
-	mockManager := &mockRedisManager{
-		client: client,
-	}
-
 	t.Run("Complex_Data_Types", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		// Create mock client and manager
+		client, mock := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, testMockManager)
 		require.NoError(t, err)
 
 		ctx := context.Background()
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
 
 		complexData := map[string]interface{}{
 			"string": "test",
@@ -756,14 +919,14 @@ func TestRedisDriver_Serialization(t *testing.T) {
 			"object": map[string]interface{}{"nested": "value"},
 		}
 
-		// Mock SET
-		mock.ExpectSet("cache:complex", mock.MatchAnyString(), time.Duration(300)*time.Second).SetVal("OK")
+		// Mock SET - serialize the complex data to JSON
+		expectedData, _ := json.Marshal(complexData)
+		mock.ExpectSet("cache:complex", expectedData, time.Duration(300)*time.Second).SetVal("OK")
 
 		err = redisDriver.Set(ctx, "complex", complexData, 0)
 		assert.NoError(t, err)
 
 		// Mock GET
-		expectedData, _ := json.Marshal(complexData)
 		mock.ExpectGet("cache:complex").SetVal(string(expectedData))
 
 		result, found := redisDriver.Get(ctx, "complex")
@@ -778,18 +941,22 @@ func TestRedisDriver_Serialization(t *testing.T) {
 	})
 
 	t.Run("Serialization_Error", func(t *testing.T) {
-		config := config.DriverRedisConfig{
+		// Create mock client and manager
+		client, _ := redismock.NewClientMock()
+		testMockManager := &mockRedisManager{
+			client: client,
+		}
+
+		configTest := config.DriverRedisConfig{
 			Enabled:    true,
 			DefaultTTL: 300,
 			Serializer: "json",
 		}
 
-		redisDriver, err := driver.NewRedisDriver(config, mockManager)
+		redisDriver, err := driver.NewRedisDriver(configTest, testMockManager)
 		require.NoError(t, err)
 
 		ctx := context.Background()
-		mock := redismock.NewClientMock()
-		mockManager.client = mock
 
 		// Try to serialize a function (not JSON serializable)
 		unserialisableData := func() {}
@@ -808,13 +975,13 @@ func TestRedisDriver_WithSerializer(t *testing.T) {
 	mockManager := &mockRedisManager{
 		client: client,
 	}
-	config := config.DriverRedisConfig{
+	configTest := config.DriverRedisConfig{
 		Enabled:    true,
 		DefaultTTL: 300,
 		Serializer: "json",
 	}
 
-	redisDriver, err := driver.NewRedisDriver(config, mockManager)
+	redisDriver, err := driver.NewRedisDriver(configTest, mockManager)
 	require.NoError(t, err)
 	require.NotNil(t, redisDriver)
 
@@ -835,3 +1002,4 @@ func TestRedisDriver_WithSerializer(t *testing.T) {
 		assert.NotNil(t, jsonDriver)
 		assert.NotEqual(t, redisDriver, jsonDriver) // Should be a new instance
 	})
+}

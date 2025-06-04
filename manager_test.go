@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.fork.vn/cache"
-	"go.fork.vn/cache/mocks"
+	cache_mocks "go.fork.vn/cache/mocks"
 )
 
 // TestManager_New kiểm tra constructor NewManager
@@ -32,7 +32,7 @@ func TestManager_New(t *testing.T) {
 func TestManager_Get(t *testing.T) {
 	t.Run("returns_value_when_default_driver_is_set_and_key_exists", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Get(context.Background(), "test-key").Return("test-value", true)
 
 		manager := cache.NewManager()
@@ -49,7 +49,7 @@ func TestManager_Get(t *testing.T) {
 
 	t.Run("returns_not_found_when_default_driver_is_set_but_key_doesnt_exist", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Get(context.Background(), "nonexistent-key").Return(nil, false)
 
 		manager := cache.NewManager()
@@ -94,7 +94,7 @@ func TestManager_Get(t *testing.T) {
 func TestManager_Set(t *testing.T) {
 	t.Run("sets_value_successfully_when_default_driver_is_configured", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Set(context.Background(), "test-key", "test-value", 5*time.Minute).Return(nil)
 
 		manager := cache.NewManager()
@@ -111,7 +111,7 @@ func TestManager_Set(t *testing.T) {
 	t.Run("returns_error_when_default_driver_set_operation_fails", func(t *testing.T) {
 		// Arrange
 		expectedError := errors.New("driver set error")
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Set(context.Background(), "test-key", "test-value", 5*time.Minute).Return(expectedError)
 
 		manager := cache.NewManager()
@@ -156,7 +156,7 @@ func TestManager_Set(t *testing.T) {
 func TestManager_Has(t *testing.T) {
 	t.Run("returns_true_when_key_exists", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Has(context.Background(), "existing-key").Return(true)
 
 		manager := cache.NewManager()
@@ -172,7 +172,7 @@ func TestManager_Has(t *testing.T) {
 
 	t.Run("returns_false_when_key_doesnt_exist", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Has(context.Background(), "nonexistent-key").Return(false)
 
 		manager := cache.NewManager()
@@ -214,7 +214,7 @@ func TestManager_Has(t *testing.T) {
 func TestManager_Delete(t *testing.T) {
 	t.Run("deletes_key_successfully_when_default_driver_is_configured", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Delete(context.Background(), "test-key").Return(nil)
 
 		manager := cache.NewManager()
@@ -231,7 +231,7 @@ func TestManager_Delete(t *testing.T) {
 	t.Run("returns_error_when_driver_delete_operation_fails", func(t *testing.T) {
 		// Arrange
 		expectedError := errors.New("driver delete error")
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Delete(context.Background(), "test-key").Return(expectedError)
 
 		manager := cache.NewManager()
@@ -263,7 +263,7 @@ func TestManager_Delete(t *testing.T) {
 func TestManager_Flush(t *testing.T) {
 	t.Run("flushes_cache_successfully_when_default_driver_is_configured", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Flush(context.Background()).Return(nil)
 
 		manager := cache.NewManager()
@@ -280,7 +280,7 @@ func TestManager_Flush(t *testing.T) {
 	t.Run("returns_error_when_driver_flush_operation_fails", func(t *testing.T) {
 		// Arrange
 		expectedError := errors.New("driver flush error")
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Flush(context.Background()).Return(expectedError)
 
 		manager := cache.NewManager()
@@ -319,7 +319,7 @@ func TestManager_GetMultiple(t *testing.T) {
 		}
 		expectedMissing := []string{"key3"}
 
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().GetMultiple(context.Background(), keys).Return(expectedFound, expectedMissing)
 
 		manager := cache.NewManager()
@@ -372,7 +372,7 @@ func TestManager_SetMultiple(t *testing.T) {
 		}
 		ttl := 10 * time.Minute
 
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().SetMultiple(context.Background(), values, ttl).Return(nil)
 
 		manager := cache.NewManager()
@@ -394,7 +394,7 @@ func TestManager_SetMultiple(t *testing.T) {
 		ttl := 10 * time.Minute
 		expectedError := errors.New("driver setMultiple error")
 
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().SetMultiple(context.Background(), values, ttl).Return(expectedError)
 
 		manager := cache.NewManager()
@@ -431,7 +431,7 @@ func TestManager_DeleteMultiple(t *testing.T) {
 		// Arrange
 		keys := []string{"key1", "key2", "key3"}
 
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().DeleteMultiple(context.Background(), keys).Return(nil)
 
 		manager := cache.NewManager()
@@ -450,7 +450,7 @@ func TestManager_DeleteMultiple(t *testing.T) {
 		keys := []string{"key1", "key2"}
 		expectedError := errors.New("driver deleteMultiple error")
 
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().DeleteMultiple(context.Background(), keys).Return(expectedError)
 
 		manager := cache.NewManager()
@@ -483,7 +483,7 @@ func TestManager_DeleteMultiple(t *testing.T) {
 func TestManager_Remember(t *testing.T) {
 	t.Run("returns_cached_value_when_key_exists", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Remember(context.Background(), "cached-key", 10*time.Minute, mock.AnythingOfType("func() (interface {}, error)")).Return("cached-value", nil)
 
 		callback := func() (interface{}, error) {
@@ -504,7 +504,7 @@ func TestManager_Remember(t *testing.T) {
 
 	t.Run("calls_callback_and_caches_result_when_key_doesnt_exist", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Remember(context.Background(), "new-key", 10*time.Minute, mock.AnythingOfType("func() (interface {}, error)")).Return("callback-value", nil)
 
 		callback := func() (interface{}, error) {
@@ -526,7 +526,7 @@ func TestManager_Remember(t *testing.T) {
 	t.Run("returns_callback_error_when_callback_fails", func(t *testing.T) {
 		// Arrange
 		expectedError := errors.New("callback error")
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Remember(context.Background(), "new-key", 10*time.Minute, mock.AnythingOfType("func() (interface {}, error)")).Return(nil, expectedError)
 
 		callback := func() (interface{}, error) {
@@ -567,7 +567,7 @@ func TestManager_Remember(t *testing.T) {
 func TestManager_AddDriver(t *testing.T) {
 	t.Run("adds_driver_successfully", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		manager := cache.NewManager()
 
 		// Act
@@ -581,7 +581,7 @@ func TestManager_AddDriver(t *testing.T) {
 
 	t.Run("sets_first_added_driver_as_default", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Get(context.Background(), "test-key").Return("test-value", true)
 
 		manager := cache.NewManager()
@@ -597,8 +597,8 @@ func TestManager_AddDriver(t *testing.T) {
 
 	t.Run("replaces_existing_driver_with_same_name", func(t *testing.T) {
 		// Arrange
-		oldDriver := mocks.NewMockDriver(t)
-		newDriver := mocks.NewMockDriver(t)
+		oldDriver := cache_mocks.NewMockDriver(t)
+		newDriver := cache_mocks.NewMockDriver(t)
 		manager := cache.NewManager()
 
 		// Act
@@ -616,8 +616,8 @@ func TestManager_AddDriver(t *testing.T) {
 func TestManager_SetDefaultDriver(t *testing.T) {
 	t.Run("sets_default_driver_successfully_when_driver_exists", func(t *testing.T) {
 		// Arrange
-		driver1 := mocks.NewMockDriver(t)
-		driver2 := mocks.NewMockDriver(t)
+		driver1 := cache_mocks.NewMockDriver(t)
+		driver2 := cache_mocks.NewMockDriver(t)
 		driver2.EXPECT().Get(context.Background(), "test-key").Return("value-from-driver2", true)
 
 		manager := cache.NewManager()
@@ -650,7 +650,7 @@ func TestManager_SetDefaultDriver(t *testing.T) {
 func TestManager_Driver(t *testing.T) {
 	t.Run("returns_driver_when_it_exists", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		manager := cache.NewManager()
 		manager.AddDriver("test-driver", mockDriver)
 
@@ -689,10 +689,10 @@ func TestManager_Stats(t *testing.T) {
 			"misses": 10,
 		}
 
-		mockDriver1 := mocks.NewMockDriver(t)
+		mockDriver1 := cache_mocks.NewMockDriver(t)
 		mockDriver1.EXPECT().Stats(context.Background()).Return(driver1Stats)
 
-		mockDriver2 := mocks.NewMockDriver(t)
+		mockDriver2 := cache_mocks.NewMockDriver(t)
 		mockDriver2.EXPECT().Stats(context.Background()).Return(driver2Stats)
 
 		manager := cache.NewManager()
@@ -724,10 +724,10 @@ func TestManager_Stats(t *testing.T) {
 func TestManager_Close(t *testing.T) {
 	t.Run("closes_all_drivers_successfully", func(t *testing.T) {
 		// Arrange
-		mockDriver1 := mocks.NewMockDriver(t)
+		mockDriver1 := cache_mocks.NewMockDriver(t)
 		mockDriver1.EXPECT().Close().Return(nil)
 
-		mockDriver2 := mocks.NewMockDriver(t)
+		mockDriver2 := cache_mocks.NewMockDriver(t)
 		mockDriver2.EXPECT().Close().Return(nil)
 
 		manager := cache.NewManager()
@@ -745,10 +745,10 @@ func TestManager_Close(t *testing.T) {
 		// Arrange
 		expectedError := errors.New("close error")
 
-		mockDriver1 := mocks.NewMockDriver(t)
+		mockDriver1 := cache_mocks.NewMockDriver(t)
 		mockDriver1.EXPECT().Close().Return(nil)
 
-		mockDriver2 := mocks.NewMockDriver(t)
+		mockDriver2 := cache_mocks.NewMockDriver(t)
 		mockDriver2.EXPECT().Close().Return(expectedError)
 
 		manager := cache.NewManager()
@@ -779,7 +779,7 @@ func TestManager_Close(t *testing.T) {
 func TestManager_Concurrency(t *testing.T) {
 	t.Run("concurrent_operations_dont_cause_race_conditions", func(t *testing.T) {
 		// Arrange
-		mockDriver := mocks.NewMockDriver(t)
+		mockDriver := cache_mocks.NewMockDriver(t)
 		mockDriver.EXPECT().Get(mock.Anything, mock.Anything).Return("value", true).Maybe()
 		mockDriver.EXPECT().Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 		mockDriver.EXPECT().Has(mock.Anything, mock.Anything).Return(true).Maybe()

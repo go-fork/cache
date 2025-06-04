@@ -2,6 +2,35 @@
 
 ## [Unreleased]
 
+### Added
+- **CI/CD Workflows**: Thêm GitHub Actions workflows cho testing, release, và dependency updates
+- **Release Automation**: Scripts tự động cho việc archive releases và tạo release templates
+- **Documentation**: Thêm README cho automation scripts trong release management
+- **MockServiceProvider**: Triển khai MockServiceProvider sử dụng mockery cho mục đích testing
+- **Unit Tests**: Tạo unit tests cho NewServiceProvider, Requires, Providers, Register, và Boot methods
+- **Integration Tests**: Thêm integration tests để xác minh lifecycle hoàn chỉnh của cache service provider
+
+### Changed
+- **Mock Packages**: Refactor mock packages và cập nhật generated files với formatting và structure nhất quán
+- **Provider Error Handling**: Cải thiện error handling trong service provider - thay đổi từ early return thành panic khi DI application là nil
+
+### Fixed
+- **Dependencies**: Regenerate go.sum với các dependencies đã cập nhật
+- **Redis Driver Tests**: Sửa lỗi trong Redis driver tests liên quan đến mock expectations và serialization
+  - Khắc phục vấn đề mock expectations không khớp với byte arrays
+  - Sửa lỗi serialization/deserialization trong test scenarios
+  - Hoàn thiện tất cả test cases cho Redis driver operations
+
+### Updated
+- **Dependencies**: Cập nhật dependencies lên phiên bản mới nhất:
+  - `go.fork.vn/config`: v0.1.2 => v0.1.3
+  - `go.fork.vn/di`: v0.1.2 => v0.1.3  
+  - `go.fork.vn/mongodb`: v0.1.1 => v0.1.2
+  - `go.fork.vn/redis`: v0.1.1 => v0.1.2
+
+### Removed
+- **Test Files**: Loại bỏ backup test files cho cache service provider tests để dọn dẹp repository
+
 ## v0.1.0 - 2025-05-31
 
 ### Added
@@ -28,7 +57,7 @@
 
 ### Technical Details
 - Initial release as standalone module `go.fork.vn/cache`
-- Repository located at `github.com/Fork/cache`
+- Repository located at `github.com/go-fork/cache`
 - Built with Go 1.23.9
 - Full test coverage and documentation included
 

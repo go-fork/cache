@@ -3,6 +3,7 @@ module go.fork.vn/cache
 go 1.23.9
 
 require (
+	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/redis/go-redis/v9 v9.9.0
 	github.com/stretchr/testify v1.10.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1

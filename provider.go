@@ -3,7 +3,7 @@ package cache
 import (
 	"go.fork.vn/cache/config"
 	"go.fork.vn/cache/driver"
-	configService "go.fork.vn/config"
+	configPkg "go.fork.vn/config"
 	"go.fork.vn/di"
 	"go.fork.vn/mongodb"
 	"go.fork.vn/redis"
@@ -55,13 +55,13 @@ func (p *serviceProvider) Requires() []string {
 //   - app: Application instance với DI container và lifecycle management
 func (p *serviceProvider) Register(app di.Application) {
 	if app == nil {
-		return
+		panic("di application can not nill.")
 	}
 
 	c := app.Container()
 
 	// Load cache manager và config manager
-	configManager, ok := c.MustMake("config").(configService.Manager)
+	configManager, ok := c.MustMake("config").(configPkg.Manager)
 	if !ok {
 		panic("Config manager is not available, please ensure config provider is registered")
 	}
@@ -135,7 +135,7 @@ func (p *serviceProvider) Register(app di.Application) {
 //   - app: Application instance với DI container và lifecycle management
 func (p *serviceProvider) Boot(app di.Application) {
 	if app == nil {
-		return
+		panic("di application can not nill.")
 	}
 }
 
