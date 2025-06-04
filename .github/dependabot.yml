@@ -23,8 +23,9 @@ updates:
       go-fork:
         patterns:
           - "go.fork.vn/config"
+          - "go.fork.vn/redis"
+          - "go.fork.vn/mongodb"
           - "go.fork.vn/di"
-          - "github.com/cache/go-cache/v9"
     allow:
       # Only allow updates for direct dependencies
       - dependency-type: "direct"
