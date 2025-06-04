@@ -3,6 +3,26 @@
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+### Updated
+
+### Removed
+
+## v0.1.1 - 2025-06-04
+
+### Added
+- **Comprehensive Documentation**: Thêm bộ tài liệu hoàn chỉnh bằng tiếng Việt với Mermaid diagrams
+  - Tài liệu hướng dẫn cấu hình chi tiết (config.md)
+  - Tài liệu driver với biểu đồ so sánh hiệu suất (driver.md)
+  - Tài liệu tổng quan hệ thống (overview.md, index.md)
+  - Tài liệu quản lý cache và service provider (manager.md, provider.md)
+  - Biểu đồ kiến trúc hệ thống với Mermaid
+  - Biểu đồ so sánh hiệu suất các driver
+  - Flowchart cho Remember Pattern và cache operations
 - **CI/CD Workflows**: Thêm GitHub Actions workflows cho testing, release, và dependency updates
 - **Release Automation**: Scripts tự động cho việc archive releases và tạo release templates
 - **Documentation**: Thêm README cho automation scripts trong release management

@@ -1,4 +1,8 @@
-# Cache Provider
+# Cache Provider v0.1.1
+
+![Version](https://img.shields.io/badge/version-v0.1.1-blue.svg)
+![Go](https://img.shields.io/badge/go-1.20+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## Giới thiệu
 
@@ -16,11 +20,43 @@ Cache Provider hỗ trợ:
 - Giao diện đơn giản cho các thao tác cache phổ biến
 - Monitoring và statistics cho performance tracking
 
+## 📚 Tài liệu chi tiết
+
+Chúng tôi cung cấp tài liệu chi tiết và đầy đủ với biểu đồ Mermaid tương tác để hiểu rõ hơn về hệ thống:
+
+### 📖 Tài liệu chính
+- **[Tổng quan hệ thống](docs/overview.md)** - Kiến trúc tổng thể và cách hoạt động
+- **[Hướng dẫn cấu hình](docs/config.md)** - Cách cấu hình và tuỳ chỉnh
+- **[Quản lý cache](docs/manager.md)** - Cache Manager và các API chính
+- **[Các driver hỗ trợ](docs/driver.md)** - Memory, File, Redis, MongoDB drivers
+- **[Provider integration](docs/provider.md)** - Tích hợp với dependency injection
+- **[Tài liệu tham khảo](docs/index.md)** - Mục lục và liên kết tài liệu
+
+### 🎯 Tính năng mới trong v0.1.1
+- ✅ Tài liệu tiếng Việt đầy đủ với biểu đồ Mermaid
+- ✅ Cải thiện CI/CD workflows
+- ✅ Nâng cấp hệ thống testing
+- ✅ Cập nhật dependencies
+- ✅ Release management automation
+
 ## Cài đặt
 
+### Cài đặt package
 ```bash
-go get go.fork.vn/cache
+go get go.fork.vn/cache@v0.1.1
 ```
+
+### Cài đặt từ source
+```bash
+git clone https://github.com/go-fork/cache.git
+cd cache
+git checkout v0.1.1
+go mod download
+```
+
+## 🚀 Bắt đầu nhanh
+
+Để bắt đầu nhanh chóng, bạn có thể xem [hướng dẫn tổng quan](docs/overview.md) hoặc làm theo ví dụ cơ bản dưới đây:
 
 ## Cấu hình
 
@@ -259,6 +295,17 @@ manager := container.MustMake("cache.manager").(cache.Manager)
 6. **Configuration**: Mỗi driver có thể yêu cầu cấu hình riêng. Tham khảo documentation của từng driver để biết chi tiết.
 
 7. **Performance**: Batch operations thường hiệu quả hơn multiple single operations, đặc biệt với Redis và MongoDB drivers.
+
+## 📋 Tài liệu đầy đủ
+
+Để hiểu sâu hơn về Cache Provider và tận dụng tối đa các tính năng, tham khảo tài liệu chi tiết:
+
+- **[📚 Mục lục tài liệu](docs/index.md)** - Điểm khởi đầu để khám phá tài liệu
+- **[🏗️ Kiến trúc hệ thống](docs/overview.md)** - Hiểu cách Cache Provider hoạt động
+- **[⚙️ Cấu hình chi tiết](docs/config.md)** - Hướng dẫn cấu hình toàn diện
+- **[🧠 Cache Manager](docs/manager.md)** - API và sử dụng Cache Manager
+- **[🔧 Drivers](docs/driver.md)** - Chi tiết về các storage backends
+- **[🔌 Provider Integration](docs/provider.md)** - Tích hợp với DI container
 
 ## Phát triển
 
