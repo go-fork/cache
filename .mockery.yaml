@@ -1,22 +1,21 @@
 with-expecter: true
-dir: mocks
-outpkg: mocks
-filename: "{{.InterfaceName | snakecase}}.go"
+resolve-type-alias: false
+disable-version-string: true
+quiet: false
+dir: "mocks"  # Giữ nguyên tên thư mục mocks
+outpkg: "cache_mocks"  # Đặt tên package động theo tên package gốc
+mockname: "Mock{{.InterfaceName}}"  # Chuẩn đặt tên mock
+structname: "Mock{{.InterfaceName}}"
+filename: "{{.InterfaceName | snakecase}}.go"  # Tên file mock theo tên interface
+issue-845-fix: true
+recursive: true
 packages:
   go.fork.vn/cache:
     interfaces:
       Manager:
-        config:
-          recursive: true
       ServiceProvider:
-        config:
-          recursive: true
   go.fork.vn/cache/driver:
     interfaces:
       Driver:
-        config:
-          recursive: true
       RedisDriver:
-        config:
-          recursive: true
 all: false
