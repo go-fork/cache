@@ -6,10 +6,10 @@ require (
 	github.com/redis/go-redis/v9 v9.9.0
 	github.com/stretchr/testify v1.10.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1
-	go.fork.vn/config v0.1.2
-	go.fork.vn/di v0.1.2
-	go.fork.vn/mongodb v0.1.1
-	go.fork.vn/redis v0.1.1
+	go.fork.vn/config v0.1.3
+	go.fork.vn/di v0.1.3
+	go.fork.vn/mongodb v0.1.2
+	go.fork.vn/redis v0.1.2
 	go.mongodb.org/mongo-driver v1.17.3
 )
 
